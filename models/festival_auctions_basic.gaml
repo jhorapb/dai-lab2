@@ -21,6 +21,7 @@ global {
 	bool startConversation;
 	list<int> controlRefuses <- [];
 	bool allRefused;
+	bool winnerDeclared;
 	
 	
 	init {
@@ -68,8 +69,9 @@ species initiator skills: [fipa, moving] {
 			cycleZero <- false;
 			resetAuction <- false;
 			pauseProgram <- false;
-			itemPrice <- float(rnd(1000, 3000));
+			itemPrice <- float(rnd(2000, 3000));
 			initialPrice <- itemPrice;
+			winnerDeclared <- false;
 			ask participant {
 				write 'The initial budget of ' + name + ' is $' + budget;
 			}
@@ -83,7 +85,7 @@ species initiator skills: [fipa, moving] {
 		if (cycle - initCycle = 9999){
 			pauseProgram <- true;
 		}
-		if (priceAdjusted or startConversation) and !allRefused {
+		if (priceAdjusted or startConversation) and !allRefused and !winnerDeclared {
 			allRefused <- false;
 			controlRefuses <- [];
 			do start_conversation with: [ to :: list(participant), protocol :: 'fipa-contract-net', performative :: 'cfp', contents :: [itemPrice]];
@@ -107,7 +109,6 @@ species initiator skills: [fipa, moving] {
 		
 	//Auctioneer receives refuse messages from participants
 	reflex receive_refuse_messages when: !empty(refuses) {
-		//controlRefuses <- [];
 		add all: refuses to: participantMessages;
 	}
 	
@@ -120,6 +121,7 @@ species initiator skills: [fipa, moving] {
 		conversationRunning <- false;
 		pauseProgram <- false;
 		allRefused <- false;
+		winnerDeclared <- false;
 		
 		loop p over: participantMessages {
 			do end_conversation with: [ message :: p, contents :: [false] ];
@@ -134,8 +136,7 @@ species initiator skills: [fipa, moving] {
 			write 'No one participated...so I will decrease the price a bit!' color: #purple;
 			itemPrice <- itemPrice * 0.9;
 			priceAdjusted <- true;
-			controlRefuses <- [];
-			allRefused <- false;	
+			controlRefuses <- [];	
 		}
 		else {
 			write 'Oh come on!!! This was too big a bargain and none of you appreciated it. This auction is now closed!' color: #purple;
@@ -143,6 +144,7 @@ species initiator skills: [fipa, moving] {
 			resetAuction <- true;
 			initiatorCreated <- false;
 		}
+		allRefused <- false;
 	}
 }
 
@@ -155,7 +157,7 @@ species participant skills: [fipa, moving]{
 
 	
 	init {
-		budget <- float(rnd(1500, 1600));
+		budget <- float(rnd(2000, 2100));
 	}
 	
 	aspect default {
@@ -178,6 +180,8 @@ species participant skills: [fipa, moving]{
 			write '\t My name is ' + name + ' and I want to buy!' color: #green ;
 			write '(My current budget is $' + budget + ' so I should be ok)' color: #green;
 			do propose with: [ message :: proposalFromInitiator, contents :: [true] ];
+			winnerDeclared <- true;
+		
 		}
 		//Participant declines because he does not have a high enough budget
 		else{
