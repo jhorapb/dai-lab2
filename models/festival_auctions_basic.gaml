@@ -131,7 +131,7 @@ species initiator skills: [fipa, moving] {
 	 */
 	reflex adjustPrice when: allRefused {
 		if (itemPrice >= 0.5 * initialPrice) {
-			write 'No one participated..so I will decrease the prize a bit!' color: #purple;
+			write 'No one participated...so I will decrease the price a bit!' color: #purple;
 			itemPrice <- itemPrice * 0.9;
 			priceAdjusted <- true;
 			controlRefuses <- [];
