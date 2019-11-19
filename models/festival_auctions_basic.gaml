@@ -12,8 +12,6 @@ global {
 	
 	bool conversationRunning;
 	int nbOfParticipants <- 3;
-	list<participant> proposers;
-	list<participant> accept_proposal_participants;
 	bool pauseProgram;
 	bool resetAuction;
 	bool initiatorCreated <- true;
@@ -88,6 +86,7 @@ species initiator skills: [fipa, moving] {
 		if (priceAdjusted or startConversation) and !allRefused and !winnerDeclared {
 			allRefused <- false;
 			controlRefuses <- [];
+			do start_conversation with: [ to :: list(participant), protocol :: 'no-protocol', performative :: 'inform', contents :: []];
 			do start_conversation with: [ to :: list(participant), protocol :: 'fipa-contract-net', performative :: 'cfp', contents :: [itemPrice]];
 			write 'Auctioneer sends a cfp message to all guests';
 			write 'The price of this item is $' + itemPrice color: #purple ;
