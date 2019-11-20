@@ -12,6 +12,7 @@ global {
 	int nbOfParticipants <- 3;
 	int nbOfInitiators <- 2;
 	int nbOfInitiatorsAlive <- 2;
+	bool justCreated <- false;
 	bool pauseProgram;
 	bool stop;
 	bool createInitiator;
@@ -29,6 +30,7 @@ global {
 	
 	reflex when: createInitiator {
 		create initiator number: 1 {}
+		justCreated <- true;
 	}
 }
 
@@ -60,7 +62,6 @@ species initiator skills: [fipa, moving] {
 	list<string> namesOfParticipantsInterested;
 	list<string> namesOfParticipantsIgnoring;
 	int numberForTesting;
-	//list<string> cfpsSentList;
 	
 	init {
 		agentColor <- #purple;
@@ -179,7 +180,7 @@ species initiator skills: [fipa, moving] {
 		namesOfParticipantsIgnoring <- [];
 		//numberOfParticipantsInterested <- 0;
 		//namesOfParticipantsInterested <- [];
-		//cfpsSentList <- [];
+
 		loop p over: participantMessages {
 			do end_conversation with: [ message :: p, contents :: [false] ];
 		}
@@ -202,7 +203,6 @@ species initiator skills: [fipa, moving] {
 			//numberOfParticipantsIgnoring <- 0;
 			//numberOfParticipantsInterested <- 0;
 			//namesOfParticipantsInterested <- [];
-			//cfpsSentList <- [];
 		}
 		else {
 			write 'Oh come on!!! This was too big a bargain and none of you appreciated it. ' + 
@@ -254,9 +254,10 @@ species participant skills: [fipa, moving]{
 	
 	
 	// Participants receive CFP messages
-	reflex receive_cfp_from_initiator when: !empty(cfps) and !stop {
+	reflex receive_cfp_from_initiator when: !empty(cfps) and (!stop or justCreated) {
 		int cfpsIndex <- 0;
 		string senderName;
+		justCreated <- false;
 		
 		loop while: cfpsIndex < length(cfps) {
 			message proposalFromInitiator <- cfps[cfpsIndex];
@@ -293,11 +294,7 @@ species participant skills: [fipa, moving]{
 							ask initiator {
 								if (myself.auctioneerName = self.name){
 									self.winnerDeclared <- true;
-									// nbOfInitiatorsAlive <- nbOfInitiatorsAlive - 1;
 									stop <- true;
-								}
-								else {
-									stop <- false;
 								}
 							}
 						
