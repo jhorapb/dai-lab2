@@ -95,7 +95,7 @@ species initiator skills: [fipa, moving] {
 			stop <- false;
 			
 			ask participant {
-				write '\t '+ myself.name + ' says: The initial budget of ' + self.name + ' for this auction is $' + self.budget color: agentColor;
+				//write '\t '+ myself.name + ' says: The initial budget of ' + self.name + ' for this auction is $' + self.budget color: agentColor;
 				write '\t ' + myself.name + ' says: ' + self.name + ' likes ' + self.preferences color:agentColor;
 			}
 		}
@@ -126,7 +126,7 @@ species initiator skills: [fipa, moving] {
 
 			write name + ' (type: ' + itemType + ', color: ' + agentColor + 
 				') sends a cfp message to all guests' color: agentColor;
-			write 'The price of this item is $' + itemPrice color: agentColor;
+			//write 'The price of this item is $' + itemPrice color: agentColor;
 		}
 	}
 	
@@ -134,7 +134,7 @@ species initiator skills: [fipa, moving] {
 	reflex receive_propose_messages when: !empty(proposes) {
 		message proposeMessageReceived <- proposes[0];
 		add all: proposes to: participantMessages; 
-		write 'We have a winner! The winner is ' + proposeMessageReceived.sender + 'for a price of $' + itemPrice color: #orange ;
+		write 'We have a winner! The winner is ' + proposeMessageReceived.sender color: #orange ;
 		do accept_proposal with: [ message :: proposeMessageReceived, contents :: [itemPrice]];
 		
 		loop p over: proposes {
@@ -190,7 +190,7 @@ species initiator skills: [fipa, moving] {
 	 */
 	reflex adjustPrice when: conversationRunning and allRefused {
 		if (itemPrice >= 0.5 * initialPrice) {
-			write 'No one participated...so I will decrease the price a bit!' color: agentColor;
+			write 'No one participated...so I will try again!' color: agentColor;
 			itemPrice <- itemPrice * 0.9;
 			priceAdjusted <- true;
 			controlRefuses <- [];
@@ -209,16 +209,16 @@ species initiator skills: [fipa, moving] {
 			'This auction is now closed!' color: agentColor;
 			priceAdjusted <- false;
 			resetAuction <- true;
-			write 'Previous auctioneer has left the scene.';
-			write 'New auctioneer enters the scene and starts preparing the auction';
+			//write 'Previous auctioneer has left the scene.';
+			//write 'New auctioneer enters the scene and starts preparing the auction';
 			createInitiator <- true;
 			do die;
 		}
 	}
 	
 	reflex dieWhenWinner when: winnerDeclared {
-		write 'Previous auctioneer has left the scene (someone WON).';
-		write 'New auctioneer enters the scene and starts preparing the auction';
+		//write 'Previous auctioneer has left the scene (someone WON).';
+		//write 'New auctioneer enters the scene and starts preparing the auction';
 		create initiator number: 1 {}
 		do die;
 	}
@@ -264,7 +264,7 @@ species participant skills: [fipa, moving]{
 			senderName <- agent(proposalFromInitiator.sender).name;
 			
 			if (!alreadyInAuction or senderInitiator.namesOfParticipantsInterested contains name) {
-				write '\t ' + name + ' says: Hey ' + senderName + '!' color: agentColor;
+				//write '\t ' + name + ' says: Hey ' + senderName + '!' color: agentColor;
 				
 				if (not(senderInitiator.namesOfParticipantsInformed contains name)) {
 					senderInitiator.numberOfParticipantsInformed <- senderInitiator.numberOfParticipantsInformed + 1;
@@ -287,7 +287,7 @@ species participant skills: [fipa, moving]{
 						interestedCycle <- cycle;
 						if (budget - float(proposalFromInitiator.contents[0]) > 0.05 * budget){
 							write '\t My name is ' + name + ' and I want to buy!' color: #green ;
-							write '(My current budget is $' + budget + ' so I should be ok)' color: #green;
+							//write '(My current budget is $' + budget + ' so I should be ok)' color: #green;
 							do propose with: [ message :: proposalFromInitiator, contents :: [true] ];
 							
 							ask initiator {
@@ -308,8 +308,8 @@ species participant skills: [fipa, moving]{
 								if (self.name = senderName) {
 									if (not(controlRefuses contains myself.name)) {
 										write '\t My name is ' + myself.name + ' and I think it\'s too expensive!' color: #red ;
-										write '(My current budget is $' + myself.budget + ' so I cannnot afford it!)' color: #red ;
-										write '{{}}} ' + name + ' plans to adds to controlRef and the #participants is ' + nbOfParticipants color: agentColor;
+										//write '(My current budget is $' + myself.budget + ' so I cannnot afford it!)' color: #red ;
+										//write '{{}}} ' + name + ' plans to adds to controlRef and the #participants is ' + nbOfParticipants color: agentColor;
 										do refuse with: [ message :: proposalFromInitiator, contents :: [false] ];
 										add myself.name to: self.controlRefuses;
 										//myself.interestedCycle <- cycle;
@@ -351,7 +351,7 @@ species participant skills: [fipa, moving]{
 		message acceptProposalFromInitiator <- accept_proposals[0];
 		write name + ' receives an accept_proposal message from ' + agent(acceptProposalFromInitiator.sender).name;
 		budget <- budget - float(acceptProposalFromInitiator.contents[0]);
-		write name + ' has adjusted his remaining budget. It is now: $' + budget;
+		//write name + ' has adjusted his remaining budget. It is now: $' + budget;
 		write 'This auction is now closed!'color: #red ;
 		alreadyInAuction <- false;
 	}
