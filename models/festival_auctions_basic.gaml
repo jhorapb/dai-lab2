@@ -7,7 +7,6 @@
 
 model festival_auctions_basic
 
-/* Insert your model definition here */
 global {
 	
 	bool conversationRunning;
